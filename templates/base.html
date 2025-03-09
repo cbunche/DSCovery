@@ -1,106 +1,91 @@
 {% load static %}
 <!doctype html>
-<html class="no-js" lang="">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  {% block viewport %}<meta name="viewport" content="width=device-width, initial-scale=1">{% endblock %}
-  <title>
-    {% block title %}{% endblock %}
-    {{ site.name }} 
-    {% block extra_title %}{% endblock %}
-  </title>
-  <link rel="stylesheet" href="{% static 'css/site.css' %}?v=5">
-  {% block site_styles %}{% endblock %}
-  <meta name="description" content="{% block description %}{% endblock %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DSCovery - Civic Tech Jobs</title>
 
-  <!-- to do: make template tag to handle this better -->
-  <meta property="og:title" content="{{ site.name }} {% block og_title %}{% endblock %}">
+  <link rel="stylesheet" href="{% static 'css/site.css' %}?v=6">
+  <meta name="description" content="Find and apply for civic tech jobs from Digital Services Coalition companies and beyond.">
+  
+  <!-- Open Graph (for social sharing) -->
+  <meta property="og:title" content="DSCovery - Civic Tech Jobs">
   <meta property="og:type" content="website">
   <meta property="og:url" content="">
-  <meta property="og:image" content="">
-  <meta property="og:image:alt" content="">  
-  {% block extra_meta %}{% endblock extra_meta %}
-  {% block canonical %}{% endblock %}
+  <meta property="og:image" content="{% static 'img/preview.png' %}">
 
-  <link rel="icon" href="{% static 'img/favicon.png' %}" sizes="any">
-  <link rel="icon" href="{% static 'img/icon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/favicon.png' %}">
   <link rel="apple-touch-icon" href="{% static 'img/touch-icon.png' %}">
   
-  <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name/theme-color -->
-  <meta name="theme-color" content="#010101">
-
-  <link rel="profile" href="http://microformats.org/profile/hcard">
-  <link rel="alternate" type="application/atom+xml" href="{% url 'job_feed' %}"> 
-  
+  <!-- JavaScript & Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.6.0/dist/cdn.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.11.1/dist/cdn.min.js"></script>
-  {% block extrahead %}{% endblock %}
-  {% block feeds %}{% endblock %}
 </head>
 
-<body id="{% block bodyid %}{% endblock %}" class="{% block bodyclass %}{% endblock %}">
+<body>
+  <!-- Navbar -->
   <header role="banner">
-    {% block banner %}
-        {% block site_name %}
-          <h1 class="site-name">
-            <a href="/" title="Home">
-              {% block logo %}{{ site.name }}{% endblock %}
-            </a>
-          </h1>
-          <h2>Aggregating civic tech jobs from <a href="http://digitalservicescoalition.org">Digital Services Coalition</a> companies and other modern civic tech firms.</h2>
-          {% block nav_tagline %}{% endblock %}
-        {% endblock %}
-    {% endblock %}
-    {% block banner_nav %}{% endblock %}
-  </header>
-  <nav role="navigation">
-  {% load flatpages %}
-    {% get_flatpages as flatpages %}
-    <ul>
+    <nav class="navbar">
+      <h1 class="site-name">
+        <a href="/" title="Home">DSCovery</a>
+      </h1>
+      <ul class="nav-menu">
+        {% get_flatpages as flatpages %}
         {% for page in flatpages %}
-            <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+          <li><a href="{{ page.url }}" class="{% if request.path == page.url %}active{% endif %}">{{ page.title }}</a></li>
         {% endfor %}
-        <li><a href="{% url 'new_jobs' %}">New jobs</a></li>
-    </ul>
-  </nav>
-  <div id="wrapper">
-    {% block messages %}
-        {% if messages %}
-          <ul class="messages">
-            {% for message in messages %}
-              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
-                {{ message }}
-              </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-    {% endblock %}{#-- end messages --#}
-    {% block content_top %}{% endblock %}
-    <main>{% block content %}{% endblock %}</main>
-    <div role="complementary">{% block complementary %}{% endblock %}</div>
-    {% block content_bottom %}{% endblock %}
+        <li><a href="{% url 'new_jobs' %}" class="{% if request.path == '/new_jobs/' %}active{% endif %}">New Jobs</a></li>
+      </ul>
+      <form action="{% url 'job_search' %}" method="GET" class="search-bar">
+        <input type="text" name="q" placeholder="Search jobs..." aria-label="Search Jobs">
+        <button type="submit">🔍</button>
+      </form>
+    </nav>
+  </header>
+
+  <!-- Filters -->
+  <div class="filter-container" x-data="{ selectedCompany: '', selectedLocation: '' }">
+    <label for="filter-company">Company:</label>
+    <select id="filter-company" x-model="selectedCompany">
+      <option value="">All</option>
+      {% for company in companies %}
+        <option value="{{ company }}">{{ company }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="filter-location">Location:</label>
+    <select id="filter-location" x-model="selectedLocation">
+      <option value="">All</option>
+      <option value="Remote">Remote</option>
+      <option value="Onsite">Onsite</option>
+    </select>
   </div>
 
-  <footer id="footer" role="contentinfo">
-    {% block footer_nav %}
-      <nav role="navigation">
-        {# uncomment if you want it #}
-        {# include 'includes/site_nav.html' #}
-      </nav>
-    {% endblock %}
-    {% block footer %}
-      <div>
-        <p class="copyright">&copy; {{ now.year }} {{ site.name }} | <a href="{% url 'job_feed' %}">RSS</a></p>
-      </div>
-    {% endblock %}
+  <!-- Job Listings -->
+  <main class="job-listings">
+    {% for job in jobs %}
+    <div class="job-card" x-show="(selectedCompany === '' || selectedCompany === '{{ job.company }}') &&
+                                 (selectedLocation === '' || selectedLocation === '{{ job.location }}')">
+      {% if job.company_logo %}
+        <img src="{{ job.company_logo.url }}" alt="{{ job.company }} logo" class="job-logo">
+      {% endif %}
+      <h3><a href="{{ job.url }}" target="_blank">{{ job.title }}</a></h3>
+      <p><strong>{{ job.company }}</strong> | {{ job.location }}</p>
+      <p>{{ job.description|truncatechars:150 }}</p>
+      <a href="{{ job.url }}" class="apply-btn" target="_blank">Apply Now</a>
+    </div>
+    {% empty %}
+      <p>No jobs found. Check back later!</p>
+    {% endfor %}
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <p class="copyright">&copy; {{ now.year }} DSCovery | <a href="{% url 'job_feed' %}">RSS</a></p>
   </footer>
 
-  {% block init_js %}{% endblock %}
-  {% block site_js %}
-    <script src="{% static 'js/site.js' %}"></script>
-    <script data-goatcounter="https://dscovery.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
-  {% endblock %}
-  {% block extra_js %}{% endblock %}
+  <!-- Site JavaScript -->
+  <script src="{% static 'js/site.js' %}"></script>
 </body>
 </html>
