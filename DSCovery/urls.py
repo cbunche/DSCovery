@@ -23,24 +23,17 @@ from .feeds import JobFeed
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     path('', JobListView.as_view(), name='jobs'),
+    path('jobs/search/', JobListView.as_view(), name='job_search'),  # Add this line
     path('jobs/new/', FreshJobListView.as_view(), name='new_jobs'),
     path('jobs/<int:pk>/', JobDetailView.as_view(), name='job_detail'),
     path('jobs/<slug:slug>/', CompanyDetailView.as_view(), name='company_detail'),
-
     path('feed/jobs', JobFeed(), name="job_feed"),
-
-
-
     path('fetch-details/', fetch_job_details, name="fetch_job"),
-
     path('import-jobs/', import_jobs, name="import_jobs"),
-    
     path('reject-job/', reject_job, name="reject_job"),
     path('update-job-status/', update_job_status, name="update_job_status"),
-
     path("pages/", include("django.contrib.flatpages.urls")),
-
-
+    path('jobs/', JobListView.as_view(), name='job_search'),
 ]
+

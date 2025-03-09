@@ -1,23 +1,21 @@
 @import "modern-normalize.css";
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap');
 
-
 /****************** THEME & VARS ******************/
-/* full color scheme from https://colorpalettes.net/color-palette-4508/ */
 :root {
   --max_width: 90vw;
-  --color-primary: #4C5D8B;
-  --color-primary-light: #6E8BB3;
+  --color-primary: #324372;
+  --color-primary-light: #5977a1;
   --color-primary-dark: #1B1F47;
   --color-danger: #a51e1e;
   --color-success: #138015;
   --color-info: #0f8894;
   --color-warning: #dc781a;
-  --color-background: #F9F7FA;
+  --color-background: #fdfdfd;
   --font-family: 'Montserrat', sans-serif;
 }
 
-/* quick reset. See https://mattbrictson.com/blog/css-normalize-and-reset */
+/* Reset */
 :root {
   line-height: 1.5;
 }
@@ -40,64 +38,143 @@ img {
   display: block;
   max-inline-size: 100%;
 }
-/********* End reset *******/
 
+/********** General Styles **********/
 body {
   background-color: var(--color-background);
   color: #222;
   font-family: var(--font-family);
 }
 
-a {color: var(--color-primary); }
-a:hover {color: var(--color-primary-dark); }
+a {
+  color: var(--color-primary);
+  transition: color 0.33s;
+}
+a:hover {
+  color: var(--color-primary-dark);
+}
 
+/********** Navbar **********/
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: var(--color-primary-dark);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-[role=banner] {
+.nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav-menu li a {
+  text-decoration: none;
+  color: white;
+  padding: 5px 10px;
+}
+
+.nav-menu .active {
+  border-bottom: 2px solid var(--color-warning);
+}
+
+/********** Search Bar **********/
+.search-bar {
   display: flex;
   align-items: center;
-  margin: 1.5em auto 1em;
-  justify-content: flex-start;
-  width: var(--max_width);
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 0.5em
 }
 
-[role="banner"] h1 {
-  font-size: 2em;
-  font-weight: bold;
-  padding-right: 2em;
-
-  a { text-decoration: none }
-}
-[role="banner"] h2 {
-  margin-top: 0.25em;
-  font-size: 0.875em;
+.search-bar input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
-.job-list {
-    border-collapse: collapse;
-    width: var(--max_width);
-    margin: 0 auto 1em;
-
-    caption {
-      text-align: left;
-      font-weight: bold;
-      font-size: 1.25em
-    }
-    th, td { 
-        max-width: 700px;
-        padding: 0.5em 1em;
-        border: 1px solid #eee;
-    }
-    th {background: #eee}
-    td { font-size: 0.875em}
-    .status-1 { background: #FFFFE0}  /* Considering */
-    .status-2 { background: #87CEEB } /* Applied */
-    .status-3 {background: #D8BFD8}
-    .status-3 {background: #90EE90}
+/********** Filters **********/
+.filter-container {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin: 20px 0;
 }
 
-.details main {
-    max-width: 100ch;
-    margin: auto
+.filter-container select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/********** Job Listings **********/
+.job-listings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.job-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.job-logo {
+  max-width: 80px;
+  margin-bottom: 10px;
+}
+
+.apply-btn {
+  background-color: var(--color-primary-light);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.apply-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/********** Footer **********/
+footer {
+  text-align: center;
+  padding: 10px;
+  background: var(--color-primary);
+  color: white;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+footer a {
+  color: white;
+}
+
+/********** Mobile Responsiveness **********/
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .nav-menu {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .job-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .job-logo {
+    max-width: 80px;
+    margin: 0 auto;
+  }
 }

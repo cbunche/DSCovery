@@ -68,15 +68,13 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.flatpages',
     'django.contrib.sessions',
-    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'profiles',
+    'django.contrib.sites',  # Required for flatpages
+    'django.contrib.flatpages',  # Required for flatpages
     'jobsearch',
-
+    'profiles',
 ]
 
 MIDDLEWARE = [
